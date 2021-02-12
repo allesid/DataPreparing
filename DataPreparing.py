@@ -1,17 +1,21 @@
-class DataPreparing(object):
+class DataPreparing:
     """ Преобразование массива pandas.DataFrame для задач регрессии
         машинного обучения
         Требует import pandas as pd
         Категорийные данные преобразуются в целые числа, располагающиеся
         по возрастанию среднего значения чисел из столбца результата y = X[col_y],
         относящихся к данной категории.
+            Исходные данные:
         X - исходный массив типа pandas.DataFrame
-        col - имя преобразуемого столбца (признака)
         col_y - имя столбца результата регрессии
         null_pct - default: 10 - процентное отношение количества отсутствующих 
                                     данных в столбце к длине столбца
         nuniqfit_pct - default: 10 - процентное отношение количества уникальных 
                                     данных в столбце к длине столбца
+
+            Возвращает:
+        X - преобразованный массив типа pandas.DataFrame
+        y - столбец результата регрессии
     """
         
     def __init__(self, X, col_y, null_pct=10, nuniqfit_pct=10):
@@ -41,14 +45,16 @@ class DataPreparing(object):
                 print("   Drop column:", colmn, " Percent of NA data:", 100*len(X[X[colmn].isna()])/len(X))
         #print(X_drop, type(X_drop))
         X = X.drop(columns=X_drop)
-        return X
+        return X, self.y
         
     def fit_col(self, X, col, col_y):
-        """ Преобразование одного столбца X[col] """
+        """ Преобразование одного столбца X[col] 
+            col - имя преобразуемого столбца (признака)
+        """
         print(" Percent of NA data:", 100*len(X[X[col].isna()])/len(X))
         print("Initial Category data in", col, "feature:", X[col].unique())
         b = X.groupby([col], as_index=False)[col_y].mean().sort_values([col_y])
-        b.index = pd.Series(range(len(b)))
+        b.index = list(range(len(b)))
         b[col+'_r'] = b.index
         #print(b)
         X[col] = X[col].replace(list(b[col]), list(b[col+'_r']))
