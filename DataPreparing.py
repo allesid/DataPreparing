@@ -1,3 +1,40 @@
+class NumToCat:
+    """    
+    преобразование числовых данных в категориальные
+    min_obs - минимальное число наблюдений для включения в группу
+    max_groups - максимальное число групп
+    """    
+    def __init__(self,min_obs=0,max_groups=10):
+        self.min_obs = min_obs
+        self.max_groups = max_groups
+
+    def fit(self, df):
+        """
+        Convert DataFrame nunerical type data to categorical type data in columns
+        """
+        self.splits_ = {}
+        for col in df.columns:
+            if df[col].dtype!='object':
+                #xm = (df[col].max() + df[col].min())/2.
+                xd = (df[col].max() - df[col].min())/self.max_groups
+                ss = []
+                for i in range(self.max_groups + 1):
+                    ss.append(xd * (i - 0.5) + df[col].min())
+                self.splits_[col] = ss
+        return self.splits_
+    
+    def transform(self, df):
+        for col in self.splits_.keys():
+            n_col = []
+            for x in df[col]:
+                ex = col+ "_" + str(len(self.splits_[col]))
+                for i in range(len(self.splits_[col])): # список
+                    if x < self.splits_[col][i]:
+                        ex = col+ "_" + str(i)
+                        break
+                n_col.append(ex)
+            df[col] = n_col
+        return df
 class DataPreparing:
     """ Преобразование массива pandas.DataFrame для задач регрессии
         машинного обучения
