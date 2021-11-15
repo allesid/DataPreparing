@@ -1,2 +1,2 @@
 # DataPreparing
-Подготовка исходных данных для машинного обучения.
+Preparing raw data for machine learning.
